@@ -1,14 +1,17 @@
+previews:
+  generation: off  # optional: disables PR preview services to avoid surprise costs
+
 services:
   - type: web
     name: hit4power
-    runtime: python             # 'env' is deprecated; use 'runtime'
-    plan: pro                   # Professional plan so disks are allowed
+    runtime: python
+    plan: starter           # <- cheapest paid plan (no auto-sleep; disks allowed)
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     disk:
       name: data
       mountPath: /data
-      sizeGB: 1
+      sizeGB: 1            # 1 GB = $0.25/month
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
