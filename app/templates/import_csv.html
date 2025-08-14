@@ -1,0 +1,12 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+  <h2>Bulk Import Players</h2>
+  <p class="muted">CSV headers: <code>name,age,phone</code></p>
+  <form method="post" action="/instructor/import" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required>
+    <button class="btn primary" type="submit">Import</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hit4Power</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <svg width="120" height="28" viewBox="0 0 120 28" aria-label="Hit4Power">
+          <rect x="0" y="6" width="120" height="16" rx="8" fill="#D7263D"></rect>
+        </svg>
+      </a>
+      <nav class="nav">
+        {% if request.session.get('instructor_id') %}
+          <a class="nav-link" href="/instructor/dashboard">Dashboard</a>
+          <form method="post" action="/logout" style="display:inline">
+            <button class="btn btn-link danger" type="submit">Logout</button>
+          </form>
+        {% elif request.session.get('player_id') %}
+          <form method="post" action="/logout" style="display:inline">
+            <button class="btn btn-link danger" type="submit">Logout</button>
+          </form>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% if request.session.get('flash_success') %}
+      <div class="flash success">
+        {{ request.session.get('flash_success') }}
+        {% set _ = request.session.pop('flash_success') %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="btn btn-link danger" target="_blank" href="https://www.instagram.com/hit4.power/">Instagram</a>
+      <a class="btn btn-link danger" target="_blank" href="https://www.hit4power.com/">Website</a>
+    </div>
+  </footer>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

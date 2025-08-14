@@ -1,0 +1,23 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-grid">
+  <div class="card">
+    <h2>Player Login</h2>
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <form method="post" action="/player/login">
+      <label>Player Code</label>
+      <input type="text" name="login_code" placeholder="6-digit code" required>
+      <button class="btn primary" type="submit">Enter</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Instructor</h2>
+    <p>Log in with your personal code or create one with the master code.</p>
+    <div class="btn-row">
+      <a class="btn primary" href="/instructor/login">Instructor Login</a>
+      <a class="btn" href="/instructor/create">Create Profile</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

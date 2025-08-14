@@ -1,0 +1,11 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+  <h2>Welcome!</h2>
+  <p>Your personal instructor code:</p>
+  <div class="big-code">{{ code }}</div>
+  <p class="muted">Keep this safe. Use it on future logins.</p>
+  <a class="btn primary" href="/instructor/dashboard">Go to Dashboard</a>
+</div>
+{% endblock %}

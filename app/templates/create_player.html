@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+  <h2>Create Player</h2>
+  <form method="post" action="/instructor/players/new">
+    <label>Name</label>
+    <input type="text" name="name" required>
+    <label>Age</label>
+    <input type="number" min="7" max="99" name="age" required>
+    <label>Phone (for texts)</label>
+    <input type="tel" name="phone" placeholder="+1...">
+    <button class="btn primary" type="submit">Create</button>
+  </form>
+  <p class="muted">After creation, you'll see a green banner with the player's login code.</p>
+</div>
+{% endblock %}

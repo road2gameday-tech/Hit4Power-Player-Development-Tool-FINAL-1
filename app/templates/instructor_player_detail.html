@@ -1,0 +1,91 @@
+
+{% extends "base.html" %}
+{% block content %}
+<a class="btn" href="/instructor/dashboard">Back to Dashboard</a>
+<div class="grid-2">
+  <div class="card">
+    <div class="row gap align-center">
+      <div class="avatar" style="background-image:url('{{ player.avatar_path if player.avatar_path else "" }}')"></div>
+      <div>
+        <h2>{{ player.name }}</h2>
+        <p class="muted">Age {{ player.age }} · Code <strong>{{ player.login_code }}</strong></p>
+      </div>
+    </div>
+    <form method="post" action="/instructor/player/{{ player.id }}/avatar" enctype="multipart/form-data" class="row gap">
+      <input type="file" name="avatar" accept="image/*" required>
+      <button class="btn" type="submit">Upload Avatar</button>
+    </form>
+    <hr>
+    <h3>Exit Velocity (last 20)</h3>
+    <canvas id="evChart" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3>Update Metrics</h3>
+    <form method="post" action="/instructor/player/{{ player.id }}/metric" class="form-grid">
+      <label>Date</label>
+      <input type="date" name="date" value="{{ now().strftime('%Y-%m-%d') if now else '' }}">
+      <label>Exit Velocity (mph)</label>
+      <input type="number" name="ev" step="0.1" required>
+      <label>Launch Angle (°)</label>
+      <input type="number" name="la" step="0.1">
+      <label>Spin Rate (rpm)</label>
+      <input type="number" name="sr" step="1">
+      <button class="btn primary" type="submit">Save</button>
+    </form>
+    <hr>
+    <h3>Coach Note</h3>
+    <form method="post" action="/instructor/player/{{ player.id }}/note" class="form-grid">
+      <label>Note</label>
+      <textarea name="content" rows="3" required></textarea>
+      <label class="checkbox"><input type="checkbox" name="share_to_player"> Share to player</label>
+      <label class="checkbox"><input type="checkbox" name="text_player"> Text player</label>
+      <button class="btn" type="submit">Add Note</button>
+    </form>
+    <hr>
+    <h3>Assign Drill</h3>
+    <form method="post" action="/instructor/player/{{ player.id }}/assign-drill" class="form-inline">
+      <select name="drill_id" required>
+        <option value="">Choose a drill</option>
+        {% for d in drills %}<option value="{{ d.id }}">{{ d.title }}</option>{% endfor %}
+      </select>
+      <label class="checkbox"><input type="checkbox" name="text_player"> Text player</label>
+      <button class="btn" type="submit">Assign</button>
+    </form>
+    <ul class="assigned-list">
+      {% for ad, d in assigned %}
+        <li>{{ d.title }} <span class="muted">({{ ad.assigned_at.strftime('%Y-%m-%d') }})</span></li>
+      {% else %}
+        <li class="muted">No assigned drills.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<script>
+  const evData = {{ ev_data | tojson }};
+  const ctx = document.getElementById('evChart').getContext('2d');
+  const labels = evData.map(d => d.date);
+  const values = evData.map(d => d.ev);
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Exit Velocity',
+        data: values,
+        borderWidth: 2,
+        borderColor: '#D7263D',
+        fill: false,
+        tension: 0.2,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+{% endblock %}

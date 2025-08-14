@@ -1,0 +1,22 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Drill Library (Instructor Only)</h2>
+  <form method="post" action="/instructor/drills/upload" enctype="multipart/form-data" class="row gap">
+    <input type="text" name="title" placeholder="Drill Title" required>
+    <input type="file" name="file" accept="video/*" required>
+    <button class="btn primary" type="submit">Upload</button>
+  </form>
+  <ul class="drill-list">
+    {% for d in drills %}
+      <li>
+        <strong>{{ d.title }}</strong>
+        <video src="/media/drills/{{ d.filename }}" controls preload="metadata"></video>
+      </li>
+    {% else %}
+      <li class="muted">No drills uploaded yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

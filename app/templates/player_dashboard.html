@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <div class="row gap align-center">
+      <div class="avatar" style="background-image:url('{{ player.avatar_path if player.avatar_path else "" }}')"></div>
+      <div><h2>{{ player.name }}</h2></div>
+    </div>
+    <hr>
+    <h3>Exit Velocity (last 20)</h3>
+    <canvas id="evChart" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3>Coach Notes</h3>
+    <ul class="notes">
+      {% for n in notes %}
+        <li><div class="note">{{ n.content }}</div><div class="meta">{{ n.created_at.strftime('%Y-%m-%d') }}</div></li>
+      {% else %}
+        <li class="muted">No coach notes yet.</li>
+      {% endfor %}
+    </ul>
+    <hr>
+    <h3>Assigned Drills</h3>
+    <ul class="drills">
+      {% for ad, d in assigned %}
+        <li><strong>{{ d.title }}</strong><video src="/media/drills/{{ d.filename }}" controls preload="metadata"></video></li>
+      {% else %}
+        <li class="muted">No drills assigned yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<script>
+  const evData = {{ ev_data | tojson }};
+  const ctx = document.getElementById('evChart').getContext('2d');
+  const labels = evData.map(d => d.date);
+  const values = evData.map(d => d.ev);
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Exit Velocity',
+        data: values,
+        borderWidth: 2,
+        borderColor: '#D7263D',
+        fill: false,
+        tension: 0.2,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+{% endblock %}

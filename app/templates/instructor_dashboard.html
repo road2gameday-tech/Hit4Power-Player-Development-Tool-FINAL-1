@@ -1,0 +1,44 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <a class="btn" href="/instructor/players/new">Create Player</a>
+  <a class="btn" href="/instructor/import">Bulk Import (CSV)</a>
+  <a class="btn" href="/instructor/drills">Drill Library</a>
+</div>
+
+<h2>Roster</h2>
+<div class="age-groups">
+  {% for label, plist in groups.items() %}
+    <div class="age-group">
+      <h3>{{ label }}</h3>
+      {% if plist %}
+        <ul class="player-list">
+          {% for p in plist %}
+            <li>
+              <button class="star {{ 'favorited' if p.id in fav_ids else '' }}" data-player="{{ p.id }}" title="Add to My List">★</button>
+              <span class="name">{{ p.name }}</span>
+              <a class="btn small" href="/instructor/player/{{ p.id }}">Manage</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">No players in this group yet.</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+document.querySelectorAll('.star').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const pid = btn.dataset.player;
+    const res = await fetch(`/instructor/favorite/${pid}`, {method:'POST'});
+    if (res.ok) {
+      const data = await res.json();
+      if (data.favorited) btn.classList.add('favorited'); else btn.classList.remove('favorited');
+    }
+  });
+});
+</script>
+{% endblock %}

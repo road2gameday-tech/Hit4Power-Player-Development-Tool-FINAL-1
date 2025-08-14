@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+  <h2>Create Instructor Profile</h2>
+  {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+  <form method="post" action="/instructor/create">
+    <label>Your Name</label>
+    <input type="text" name="name" required>
+    <label>Master Code</label>
+    <input type="text" name="master_code" required>
+    <button class="btn primary" type="submit">Create</button>
+  </form>
+  <p class="muted">You'll get a personal login code to use going forward.</p>
+</div>
+{% endblock %}
