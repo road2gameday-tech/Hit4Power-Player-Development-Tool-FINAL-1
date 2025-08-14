@@ -1,61 +1,85 @@
-
 {% extends "base.html" %}
+{% block title %}Player Dashboard{% endblock %}
 {% block content %}
-<div class="grid-2">
-  <div class="card">
-    <div class="row gap align-center">
-      <div class="avatar" style="background-image:url('{{ player.avatar_path if player.avatar_path else "" }}')"></div>
-      <div><h2>{{ player.name }}</h2></div>
-    </div>
-    <hr>
-    <h3>Exit Velocity (last 20)</h3>
-    <canvas id="evChart" height="200"></canvas>
+
+<section class="card">
+  <div class="card-title">Latest Metrics</div>
+  <div class="metrics-row">
+    <div class="metric"><div class="label">Exit Velocity</div><div class="value">{{ latest.ev or 0 }}</div><div class="unit">MPH</div></div>
+    <div class="metric"><div class="label">Spin Rate</div><div class="value">{{ latest.spin or 0 }}</div><div class="unit">rpm</div></div>
+    <div class="metric"><div class="label">Launch Angle</div><div class="value">{{ latest.la or 0 }}</div><div class="unit">°</div></div>
   </div>
-  <div class="card">
-    <h3>Coach Notes</h3>
-    <ul class="notes">
-      {% for n in notes %}
-        <li><div class="note">{{ n.content }}</div><div class="meta">{{ n.created_at.strftime('%Y-%m-%d') }}</div></li>
-      {% else %}
-        <li class="muted">No coach notes yet.</li>
+</section>
+
+<section class="card">
+  <div class="card-title">Exit Velocity (last 20)</div>
+  <div class="chart-wrap"><canvas id="evChart" height="220"></canvas></div>
+</section>
+
+<section class="card">
+  <div class="card-title">Assigned Drills</div>
+  {% if drills and drills|length %}
+    <ul class="list">
+      {% for d in drills %}
+        <li><strong>{{ d.title }}</strong> — {{ d.note or '' }}</li>
       {% endfor %}
     </ul>
-    <hr>
-    <h3>Assigned Drills</h3>
-    <ul class="drills">
-      {% for ad, d in assigned %}
-        <li><strong>{{ d.title }}</strong><video src="/media/drills/{{ d.filename }}" controls preload="metadata"></video></li>
-      {% else %}
-        <li class="muted">No drills assigned yet.</li>
+  {% else %}
+    <div class="muted">No drills assigned yet.</div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <div class="card-title">Coach Notes</div>
+  {% if coach_notes and coach_notes|length %}
+    <ul class="list">
+      {% for n in coach_notes %}
+        <li><span class="muted">{{ n.created_at.strftime("%b %d, %Y") }}:</span> {{ n.text }}</li>
       {% endfor %}
     </ul>
-  </div>
-</div>
-<script>
-  const evData = {{ ev_data | tojson }};
-  const ctx = document.getElementById('evChart').getContext('2d');
-  const labels = evData.map(d => d.date);
-  const values = evData.map(d => d.ev);
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Exit Velocity',
-        data: values,
-        borderWidth: 2,
-        borderColor: '#D7263D',
-        fill: false,
-        tension: 0.2,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true } },
-      plugins: { legend: { display: false } }
+  {% else %}
+    <div class="muted">No notes yet.</div>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script>
+    // Data from server
+    const evPoints = {{ ev_series|tojson|safe }}; // [{date:"2025-08-01", value: 74.2}, ...]
+    const labels = evPoints.map(p => p.date);
+    const values = evPoints.map(p => p.value);
+
+    const el = document.getElementById('evChart');
+    if (!values.length) {
+      el.parentElement.innerHTML = '<div class="muted">No data to chart yet.</div>';
+    } else {
+      new Chart(el, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Exit Velocity (MPH)',
+            data: values,
+            borderColor: '#ff2a2a',
+            backgroundColor: 'rgba(255,42,42,.08)',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: .3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true } },
+          scales: {
+            x: { ticks: { maxTicksLimit: 6 } },
+            y: { beginAtZero: false }
+          }
+        }
+      });
     }
-  });
-</script>
+  </script>
 {% endblock %}
